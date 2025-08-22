@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dimz Developer - Portfolio Sidebar</title>
+
+  <!-- Fonts & Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css"/>
+
+  <!-- 🔥 Tambahan Library untuk fitur baru -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.7.3/dist/vanilla-tilt.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:"Poppins",sans-serif;transition:background 0.6s,color 0.6s;overflow-x:hidden}
+    body.dark{background:#0f172a;color:#f9fafb}
+    body.light{background:#f9fafb;color:#111827}
+
+    /* Loading */
+    #loading{position:fixed;top:0;left:0;width:100%;height:100%;background:#0f172a;
+      display:flex;justify-content:center;align-items:center;z-index:99999}
+    #loading span{width:50px;height:50px;border:5px solid #3b82f6;border-top-color:transparent;
+      border-radius:50%;animation:spin 1s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* Header */
+    header{position:fixed;top:0;left:0;width:100%;padding:1rem 2rem;
+      display:flex;justify-content:space-between;align-items:center;
+      backdrop-filter:blur(10px);z-index:1000}
+    header h1{font-size:1.3rem}
+    .menu-btn{font-size:24px;cursor:pointer;color:inherit}
+
+    /* Sidebar drawer */
+    .sidebar{position:fixed;top:0;right:-250px;width:250px;height:100%;background:#1e293b;
+      transition:0.4s;padding:2rem 1rem;display:flex;flex-direction:column;gap:1.2rem;z-index:1200}
+    .sidebar.active{right:0}
+    .sidebar a{color:#f1f5f9;text-decoration:none;font-weight:600;padding:0.5rem;border-radius:8px}
+    .sidebar a:hover,.sidebar a.active{background:#3b82f6;color:#fff}
+    .close-btn{align-self:flex-end;font-size:22px;color:#fff;cursor:pointer}
+
+    main{padding:5rem 2rem}
+    section{min-height:100vh;padding:4rem 2rem;display:flex;flex-direction:column;
+      justify-content:center;align-items:center;text-align:center}
+
+    .gradient-text{font-size:2.2rem;font-weight:700;
+      background:linear-gradient(90deg,#3b82f6,#06b6d4,#9333ea);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      background-size:200% auto;animation:gradientMove 6s linear infinite}
+    @keyframes gradientMove{0%{background-position:0% center}100%{background-position:200% center}}
+
+    .btn-glow{margin-top:1rem;padding:0.8rem 1.6rem;border:none;border-radius:50px;
+      background:#3b82f6;color:#fff;font-weight:600;cursor:pointer;transition:0.3s}
+    .btn-glow:hover{transform:scale(1.05);box-shadow:0 0 20px rgba(59,130,246,0.6)}
+
+    /* Cursor Glow */
+    #cursor-glow{position:fixed;width:20px;height:20px;background:rgba(59,130,246,0.6);
+      border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);
+      filter:blur(10px);z-index:999}
+
+    /* Projects Tabs */
+    .tabs{display:flex;gap:1rem;margin-bottom:2rem;flex-wrap:wrap;justify-content:center}
+    .tabs button{padding:0.6rem 1.2rem;border:none;border-radius:8px;
+      background:#334155;color:#fff;font-weight:600;cursor:pointer}
+    .tabs button.active{background:#3b82f6}
+    .project-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+      gap:1.5rem;width:100%}
+    .project-item{padding:1rem;border:1px solid rgba(255,255,255,0.1);
+      border-radius:12px;transition:0.3s;cursor:pointer;background:#0f172a}
+    .project-item:hover{transform:translateY(-5px);box-shadow:0 8px 20px rgba(0,0,0,0.2)}
+
+    footer{padding:1rem;text-align:center;opacity:0.8}
+
+    /* Modal Project */
+    .modal{position:fixed;top:0;left:0;width:100%;height:100%;
+      background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:2000}
+    .modal.active{display:flex}
+    .modal-content{background:#1e293b;padding:2rem;border-radius:12px;max-width:600px;width:90%;text-align:center;position:relative}
+    .modal-content img{width:100%;border-radius:8px;margin-bottom:1rem}
+    .close-modal{position:absolute;top:10px;right:15px;font-size:24px;color:#fff;cursor:pointer}
+
+    /* Carousel Gallery */
+    .swiper{width:100%;max-width:700px;margin:2rem auto}
+    .swiper-slide img{width:100%;border-radius:12px}
+    
+    /* Intro Floating Section */
+#intro {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: radial-gradient(circle at top, #1e1b4b, #0f172a);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+#intro .intro-content {
+  animation: float 4s ease-in-out infinite;
+}
+
+#intro .icons {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+#intro .icons i {
+  font-size: 1.8rem;
+  padding: 14px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+  box-shadow: 0 0 20px rgba(99,102,241,0.6);
+  transition: 0.3s;
+}
+#intro .icons i:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 25px rgba(139,92,246,0.9);
+}
+
+#intro h2 {
+  font-size: 1.5rem;
+  margin-bottom: .5rem;
+}
+
+#intro h1 {
+  font-size: 2rem;
+  font-weight: 700;
+}
+#intro h1 span {
+  background: linear-gradient(90deg,#6366f1,#a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+#intro p {
+  margin-top: 1rem;
+  opacity: 0.8;
+}
+
+@keyframes float {
+  0%,100% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+}
+.icon-wrapper {
+  width: 80px; /* ukuran tetap */
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: visible; /* agar scale tidak memotong */
+}
+
+.icon-wrapper:hover .icon {
+  transform: scale(1.3);
+  transition: transform 0.3s ease;
+}
+
+.icon {
+  width: 50px;
+  height: 50px;
+}
+#bg-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-width: 100%;
+  min-height: 100%;
+  object-fit: cover;
+  z-index: -1; /* agar di belakang semua konten */
+  filter: brightness(0.6); /* opsional: biar teks tetap terbaca */
+}
+.skills-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.skill-card {
+  background: rgba(30,41,59,0.7);
+  border-radius: 16px;
+  padding: 1.5rem;
+  width: 160px;
+  text-align: center;
+  transition: 0.4s ease;
+  cursor: pointer;
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.skill-card img {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 0.8rem;
+  transition: transform 0.4s ease;
+}
+
+.skill-card h3 {
+  margin-bottom: 0.8rem;
+}
+
+.skill-card:hover {
+  transform: translateY(-10px) scale(1.05);
+  box-shadow: 0 10px 30px rgba(59,130,246,0.4);
+  border: 2px solid #3b82f6;
+}
+
+.skill-card:hover img {
+  transform: rotate(10deg) scale(1.2);
+}
+
+/* Progress Bar */
+.progress {
+  width: 100%;
+  height: 8px;
+  background: #1e293b;
+  border-radius: 50px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.bar {
+  height: 100%;
+  border-radius: 50px;
+  width: 0;
+  transition: width 1.5s ease;
+}
+
+.bar.html { background: #f97316; width: 95%; }
+.bar.css { background: #3b82f6; width: 90%; }
+.bar.js { background: #facc15; width: 85%; }
+.bar.react { background: #06b6d4; width: 80%; }
+.bar.node { background: #22c55e; width: 75%; }
+#particles-js {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+#hero {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1; /* biar teksnya muncul di atas partikel */
+}
+  </style>
+</head>
+<body class="dark">
+  <!-- Tambahkan di dalam <body>, sebelum konten utama -->
+<video autoplay muted loop playsinline preload="metadata" id="bg-video">
+  <source src="https://files.catbox.moe/4yzklv.mp4" type="video/mp4">
+</video>
+  <!-- Loading -->
+  <div id="loading"><span></span></div>
+  <!-- Cursor Glow -->
+  <div id="cursor-glow"></div>
+
+  <!-- Header -->
+  <header>
+    <h1>Dimz <span class="gradient-text">Dev</span></h1>
+    <i class="fas fa-ellipsis-v menu-btn" onclick="toggleSidebar()"></i>
+  </header>
+
+  <!-- Sidebar drawer -->
+  <div class="sidebar" id="sidebar">
+    <i class="fas fa-times close-btn" onclick="toggleSidebar()"></i>
+    <a href="#hero" class="typewriter" data-text="Home"></a>
+    <a href="#about" class="typewriter" data-text="Tentang"></a>
+    <a href="#projects" class="typewriter" data-text="Projek"></a>
+    <a href="#cv-dimas" class="typewriter" data-text="CV"></a>
+    <a href="#skills" class="typewriter" data-text="Skill"></a>
+
+    <!-- 🔗 Sosial Media -->
+    <div style="margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;justify-content:center">
+      <a href="mailto:dimasputr503n@gmail.com" target="_blank"><i class="fas fa-envelope"></i></a>
+      <a href="https://wa.me/6288221444002" target="_blank"><i class="fab fa-whatsapp"></i></a>
+      <a href="https://github.com/" target="_blank"><i class="fab fa-github"></i></a>
+      <a href="https://instagram.com/" target="_blank"><i class="fab fa-instagram"></i></a>
+      <a href="https://linkedin.com/" target="_blank"><i class="fab fa-linkedin"></i></a>
+    </div>
+  </div>
+  <!-- Awalan Intro -->
+<section id="intro">
+  <div class="intro-content">
+    <div class="icons">
+      <i class="fas fa-code"></i>
+      <i class="fas fa-user"></i>
+      <i class="fab fa-github"></i>
+    </div>
+    <h2>Welcome To My</h2>
+    <h1><span>Portfolio</span> <span>Website</span></h1>
+    <p><i class="fas fa-globe"></i> www.dimzdev</p>
+  </div>
+</section>
+
+  <main>
+    <!-- Hero -->
+    <section id="hero">
+      <h2 class="gradient-text" data-aos="fade-up">Halo, Dimas Putra Pratama</h2>
+      <p id="typewriter"></p>
+      <button class="btn-glow" onclick="playClick()">Hayy saya dimas</button>
+    </section>
+
+    <!-- About -->
+    <section id="about">
+      <h2 class="gradient-text" data-aos="fade-up">Tentang Saya</h2>
+
+      <!-- 🔥 Foto Profil Bulat -->
+      <div style="margin-top:2rem;" data-aos="zoom-in">
+        <img src="https://files.catbox.moe/y6r2m3.jpg" 
+             alt="Foto Profil Dimas" 
+             style="width:160px;height:160px;object-fit:cover;
+                    border-radius:50%;border:4px solid #3b82f6;
+                    box-shadow:0 0 20px rgba(59,130,246,0.5)">
+      </div>
+
+      <p id="aboutText" style="max-width:700px;line-height:1.8;margin-top:1.5rem;"></p>
+    </section>
+
+    <!-- Projects -->
+    <section id="projects">
+      <h2 class="gradient-text" data-aos="fade-up">Projek</h2>
+      <div class="tabs" data-aos="fade-up" data-aos-delay="200">
+        <button class="active" onclick="filterProjects('all',event)">Semua</button>
+        <button onclick="filterProjects('web',event)">Web</button>
+        <button onclick="filterProjects('uiux',event)">UI/UX</button>
+        <button onclick="filterProjects('ecommerce',event)">E-Commerce</button>
+      </div>
+      <!-- Project List -->
+      <div class="project-list" id="projectList" data-aos="zoom-in">
+        <div class="project-item" data-category="web" onclick="openModal('Skill','https://files.catbox.moe/bxpbj1.jpg')">🌐 Skill</div>
+        <div class="project-item" data-category="uiux" onclick="openModal('Hosting Pterodactly','https://files.catbox.moe/6ssq4l.jpg')">🎨 Pterodactly panel</div>
+        <div class="project-item" data-category="ecommerce" onclick="openModal('E-Commerce Fashion','https://files.catbox.moe/15h62d.jpg')">🛍 E-Commerce Fashion</div>
+        <div class="project-item" data-category="web" onclick="openModal('Hosting Payment System','https://files.catbox.moe/wwdvpq.jpg')">⚡ Hosting Payment System</div>
+      </div>
+
+      <!-- Carousel Showcase -->
+      <div class="swiper" data-aos="fade-up" data-aos-delay="400">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide"><img src="https://files.catbox.moe/9m6a8m.jpg" alt="myfavorit"></div>
+          <div class="swiper-slide"><img src="https://files.catbox.moe/o40wzv.jpg" alt="myfavorit"></div>
+          <div class="swiper-slide"><img src="https://files.catbox.moe/zev9ut.jpg" alt="myfavorit"></div>
+        </div>
+        <div class="swiper-pagination"></div>
+      </div>
+
+      <div style="margin-top:2rem;">
+        <button class="btn-glow" onclick="launchConfetti()">🎉 Lihat Semua Karya</button>
+      </div>
+    </section>
+
+<!-- CV -->
+    <section id="cv-dimas">
+      <h2 class="gradient-text" data-aos="fade-up">CV Dimas Putra Pratama</h2>
+      <p id="cvText" style="max-width:800px;line-height:1.8;margin-top:1rem;text-align:justify;" data-aos="fade-up" data-aos-delay="200"></p>
+      <div style="margin-top:1.5rem;" data-aos="zoom-in" data-aos-delay="800">
+        <a href="https://files.catbox.moe/nqbgen.odt" target="_blank" class="btn-glow">📄 Lihat CV</a>
+      </div>
+    </section>
+
+<!-- 🔥 Skill Section -->
+<section id="skills">
+  <h2 class="gradient-text" data-aos="fade-up">Skill</h2>
+  <div class="skills-container" data-aos="zoom-in">
+    <div class="skill-card" onclick="openSkill('HTML', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg', 'Bahasa markup untuk struktur dasar website.')">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML">
+      <h3>HTML</h3>
+      <div class="progress"><div class="bar html"></div></div>
+    </div>
+    <div class="skill-card" onclick="openSkill('CSS', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg', 'Digunakan untuk desain dan styling halaman website.')">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" alt="CSS">
+      <h3>CSS</h3>
+      <div class="progress"><div class="bar css"></div></div>
+    </div>
+    <div class="skill-card" onclick="openSkill('JavaScript', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg', 'Memberikan interaktivitas dan logika pada website.')">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JS">
+      <h3>JavaScript</h3>
+      <div class="progress"><div class="bar js"></div></div>
+    </div>
+    <div class="skill-card" onclick="openSkill('React', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg', 'Framework frontend untuk UI interaktif.')">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" alt="React">
+      <h3>React</h3>
+      <div class="progress"><div class="bar react"></div></div>
+    </div>
+    <div class="skill-card" onclick="openSkill('Node.js', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg', 'JavaScript runtime untuk backend.')">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" alt="Node">
+      <h3>Node.js</h3>
+      <div class="progress"><div class="bar node"></div></div>
+    </div>
+  </div>
+</section>
+
+  </main>
+
+<!-- Modal Project -->
+<div class="modal" id="projectModal">
+  <div class="modal-content">
+    <span class="close-modal" onclick="closeModal()">&times;</span>
+    <h3 id="modalTitle"></h3>
+    <img id="modalImage" src="" alt="Project Preview">
+  </div>
+</div>
+
+<!-- Modal Skill -->
+<div class="modal" id="skillModal">
+  <div class="modal-content">
+    <span class="close-modal" onclick="closeSkill()">&times;</span>
+    <h3 id="skillTitle"></h3>
+    <img id="skillImage" src="" alt="Skill Logo" style="width:100px;height:100px;object-fit:contain;margin:1rem 0">
+    <p id="skillDesc" style="line-height:1.6"></p>
+  </div>
+</div>
+  </section>
+  
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+// ====================== Loading & AOS ======================
+window.addEventListener("load", () => {
+  document.getElementById("loading").style.display = "none";
+  AOS.init({ duration: 1000 });
+  typeLoopHero();
+  typeAbout();
+  typeCV();
+  typeSidebar();
+  initParticles();
+  initSwiper();
+  initTilt();
+  setYear();
+});
+
+// ====================== Sidebar toggle ======================
+function toggleSidebar() {
+  document.getElementById("sidebar").classList.toggle("active");
+}
+
+// ====================== Cursor Glow ======================
+const cursor = document.getElementById("cursor-glow");
+document.addEventListener("mousemove", e => {
+  cursor.style.top = e.clientY + "px";
+  cursor.style.left = e.clientX + "px";
+});
+
+// ====================== Hero Typewriter ======================
+const subtitle = document.getElementById("typewriter");
+const heroTexts = ["Web Developer", "UI Designer", "Freelancer", "Html","Style css","java script"];
+let i = 0, j = 0, current = "", del = false;
+function typeLoopHero() {
+  if (i < heroTexts.length) {
+    if (!del && j <= heroTexts[i].length) current = heroTexts[i].substring(0, j++);
+    else if (del && j >= 0) current = heroTexts[i].substring(0, j--);
+    subtitle.textContent = current;
+    if (j === heroTexts[i].length + 1) { del = true; setTimeout(typeLoopHero, 1000); return; }
+    if (del && j === 0) { del = false; i = (i + 1) % heroTexts.length; }
+    setTimeout(typeLoopHero, del ? 80 : 120);
+  }
+}
+
+// ====================== About Typewriter ======================
+const aboutEl = document.getElementById("aboutText");
+const aboutText = "Halo, saya Dimas Putra Pratama, seorang Web Developer yang fokus pada pembuatan website modern, interaktif, dan responsif. Saya memiliki pengalaman dalam HTML, CSS, JavaScript, dan framework populer untuk membangun aplikasi web yang tidak hanya fungsional tetapi juga menarik secara visual.Saya percaya bahwa setiap proyek adalah kesempatan untuk belajar hal baru dan menghadirkan solusi kreatif bagi pengguna. Dengan kemampuan problem solving dan ketelitian dalam coding, saya berkomitmen untuk menghadirkan hasil kerja yang berkualitas tinggi.Selain itu, saya juga aktif mempelajari teknologi terbaru, seperti framework frontend, backend development, dan optimasi performa website, agar selalu siap menghadapi tantangan di dunia digital yang terus berkembang.Keahlian Utama:Web Development: HTML, CSS, JavaScript, React, Node.js Desain Responsif & UI/UXPengembangan aplikasi interaktif dan animasi web Optimasi performa website dan SEO dasar Saya selalu bersemangat untuk bekerja dalam tim maupun proyek personal, dengan tujuan menciptakan pengalaman digital yang memuaskan pengguna dan sesuai standar profesional.";
+let idx = 0;
+function typeAbout() {
+  if (idx < aboutText.length) {
+    aboutEl.textContent += aboutText.charAt(idx++);
+    setTimeout(typeAbout, 30);
+  }
+}
+
+// ====================== CV Typewriter ======================
+const cvEl = document.getElementById("cvText");
+const cvFull = "About Me Halo, saya Dimas Putra Pratama, seorang Web Developer dan Software Enthusiast dengan pengalaman dalam membangun aplikasi web modern yang responsif dan user-friendly. Saya memiliki keahlian dalam HTML, CSS, JavaScript, dan berbagai framework seperti React.js dan Node.js, serta pengalaman dalam mengelola database dan backend untuk mendukung aplikasi yang scalable.Saya selalu berfokus pada solusi kreatif dan efisiensi kode, dengan perhatian besar terhadap detail, keamanan, dan performa. Saya senang belajar teknologi terbaru dan menerapkannya untuk menyelesaikan masalah nyata. Selain itu, saya juga terbiasa bekerja secara tim maupun independen untuk mencapai target proyek yang diinginkan.Visi saya adalah mengembangkan produk digital yang inovatif, berkualitas tinggi, dan memberikan pengalaman terbaik bagi pengguna.";
+let cvIdx = 0;
+function typeCV() {
+  if (cvIdx < cvFull.length) {
+    cvEl.textContent += cvFull.charAt(cvIdx++);
+    setTimeout(typeCV, 35);
+  }
+}
+
+// ====================== Sidebar Typewriter ======================
+function typeSidebar() {
+  document.querySelectorAll(".typewriter").forEach(el => {
+    const txt = el.dataset.text;
+    let k = 0;
+    function loop() {
+      if (k < txt.length) {
+        el.textContent += txt.charAt(k++);
+        setTimeout(loop, 40);
+      }
+    }
+    loop();
+  });
+}
+
+// ====================== Confetti ======================
+function launchConfetti() {
+  confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+}
+
+// ====================== Share ======================
+function shareSite() {
+  if (navigator.share) {
+    navigator.share({ title: "Portfolio Dimz Dev", url: window.location.href });
+  } else {
+    alert("Browser tidak mendukung share API");
+  }
+}
+
+// ====================== Click Sound ======================
+const clickSound = new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3");
+function playClick() { clickSound.play(); }
+
+// ====================== Project Filter ======================
+function filterProjects(cat, ev) {
+  const items = document.querySelectorAll(".project-item");
+  document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
+  ev.target.classList.add("active");
+  items.forEach(item => {
+    item.style.display = (cat === "all" || item.dataset.category === cat) ? "block" : "none";
+  });
+}
+
+// ====================== Modal Project ======================
+function openModal(title, img) {
+  document.getElementById("modalTitle").textContent = title;
+  document.getElementById("modalImage").src = img;
+  document.getElementById("projectModal").classList.add("active");
+}
+function closeModal() { document.getElementById("projectModal").classList.remove("active"); }
+
+// ====================== Swiper Carousel ======================
+function initSwiper() {
+  new Swiper('.swiper', {
+    pagination: { el: '.swiper-pagination' },
+    loop: true,
+    autoplay: { delay: 2500, disableOnInteraction: false }
+  });
+}
+
+// ====================== Tilt Effect ======================
+function initTilt() {
+  VanillaTilt.init(document.querySelectorAll(".project-item"), { max: 15, speed: 300, glare: true, "max-glare": 0.4 });
+}
+
+// ====================== Particles.js ======================
+function initParticles() {
+  const hero = document.getElementById("hero");
+  const particlesDiv = document.createElement("div");
+  particlesDiv.id = "particles-js";
+  particlesDiv.style.position = "absolute";
+  particlesDiv.style.top = "0";
+  particlesDiv.style.left = "0";
+  particlesDiv.style.width = "100%";
+  particlesDiv.style.height = "100%";
+  hero.appendChild(particlesDiv);
+
+  particlesJS("particles-js", {
+    particles: {
+      number: { value: 80, density: { enable: true, value_area: 800 } },
+      color: { value: "#3b82f6" },
+      shape: { type: "circle" },
+      opacity: { value: 0.5, random: false },
+      size: { value: 4, random: true },
+      line_linked: { enable: true, distance: 150, color: "#3b82f6", opacity: 0.4, width: 1 },
+      move: { enable: true, speed: 3, direction: "none", random: false, straight: false, out_mode: "out" }
+    },
+    interactivity: {
+      detect_on: "canvas",
+      events: {
+        onhover: { enable: true, mode: "repulse" },
+        onclick: { enable: true, mode: "push" }
+      },
+      modes: {
+        repulse: { distance: 100, duration: 0.4 },
+        push: { particles_nb: 4 }
+      }
+    },
+    retina_detect: true
+  });
+}
+
+// ====================== Analytics (contoh) ======================
+console.log("Analytics: Portfolio dibuka pada " + new Date().toLocaleString());
+// Scroll otomatis ke #hero setelah 4 detik
+setTimeout(() => {
+  document.querySelector("#hero").scrollIntoView({behavior:"smooth"});
+}, 4000);
+// ====================== Animate Skill Progress ======================
+const skillCards = document.querySelectorAll(".skill-card .bar");
+let skillsPlayed = false;
+
+window.addEventListener("scroll", () => {
+  const skillsSection = document.querySelector("#skills");
+  const pos = skillsSection.getBoundingClientRect().top;
+  if (pos < window.innerHeight - 100 && !skillsPlayed) {
+    skillsPlayed = true;
+    skillCards.forEach(bar => {
+      bar.style.width = bar.classList.contains("html") ? "95%" :
+                        bar.classList.contains("css") ? "90%" :
+                        bar.classList.contains("js") ? "85%" :
+                        bar.classList.contains("react") ? "80%" : "75%";
+    });
+  }
+});
+// ====================== Modal Skill ======================
+function openSkill(title, img, desc) {
+  document.getElementById("skillTitle").textContent = title;
+  document.getElementById("skillImage").src = img;
+  document.getElementById("skillDesc").textContent = desc;
+  document.getElementById("skillModal").classList.add("active");
+}
+function closeSkill() {
+  document.getElementById("skillModal").classList.remove("active");
+}
+</script>
+</body>
+</html>
